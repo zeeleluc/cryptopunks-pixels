@@ -26,7 +26,7 @@ if (is_cli()) {
         }
 
         // validate action
-        $action = $argv[1];
+        $action = camelize($argv[1]);
         if (!method_exists(Punk::class, $action)) {
             throw new Exception('Method `' . $action . '` does not exists');
         }
@@ -42,7 +42,16 @@ if (is_cli()) {
 
         // perform the action
         $punk = new Punk($id);
-        $punk->{$action}();
+        $result = $punk->{$action}();
+
+        if ($result) {
+            echo '-------' . PHP_EOL;
+            if (is_array($result)) {
+                $json = json_encode($result, JSON_PRETTY_PRINT);
+                print_r($json);
+            }
+            echo PHP_EOL;
+        }
 
     } catch (Exception $e) {
         echo $e->getMessage() . PHP_EOL;

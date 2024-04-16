@@ -3,9 +3,33 @@
 class Punk
 {
 
+    private ?array $properties = null;
+
+    private ?array $accessories = null;
+
+    private ?string $gender = null;
+
+    private ?string $type = null;
+
+    private ?string $skin = null;
+
+    /**
+     * @throws Exception
+     */
     public function __construct(readonly ?int $id = null)
     {
+        if ($this->id) {
+            $this->properties = $this->getProperties();
 
+            $this->accessories = $this->properties['accessories'];
+            $this->gender = $this->properties['gender'];
+            $this->type = $this->properties['type'];
+            if (in_array($this->type, ['Zombie', 'Alien', 'Ape'])) {
+                $this->skin = $this->type;
+            } else {
+                $this->skin = $this->properties['skin'];
+            }
+        }
     }
 
     /**
@@ -47,5 +71,109 @@ class Punk
 
         $imagick->drawImage($draw);
         $imagick->writeImage('generated/rasterized/' . $this->id . '.png');
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getPixels(): array
+    {
+        if (!$this->id) {
+            throw new Exception('Need an ID');
+        }
+
+        return [
+            'Type' => $this->getTypePixels(),
+            'Skin' => $this->getSkinPixels(),
+            'Eyes, Nose & Mouth' => $this->getEyesNoseMouthPixels(),
+            'Accessories' => $this->getAccessoriesPixels(),
+        ];
+    }
+
+    public function getAccessoriesPixels(): array
+    {
+        if (!$this->id) {
+            throw new Exception('Need an ID');
+        }
+
+        $pixels = [];
+        foreach ($this->accessories as $accessory) {
+            $basePath = 'data/properties/accessory';
+            $csvFile = $basePath . '/' . $this->gender . '/' . $accessory . '.csv';
+
+            $pixels[$accessory] = determine_pixels(csv_to_array($csvFile));
+        }
+
+        return $pixels;
+    }
+
+    public function getEyesNoseMouthPixels(): array
+    {
+        if (!$this->id) {
+            throw new Exception('Need an ID');
+        }
+
+        $basePath = 'data/properties/eyes-nose-mouth/Human';
+        $csvFile = $basePath . '/' . $this->gender . '/' . $this->skin . '.csv';
+
+        return determine_pixels(csv_to_array($csvFile));
+    }
+
+    public function getSkinPixels(): array
+    {
+        if (!$this->id) {
+            throw new Exception('Need an ID');
+        }
+
+        $basePath = 'data/properties/skin/Human';
+        $csvFile = $basePath . '/' . $this->gender . '/' . $this->skin . '.csv';
+
+        return determine_pixels(csv_to_array($csvFile));
+    }
+
+    public function getTypePixels(): array
+    {
+        if (!$this->id) {
+            throw new Exception('Need an ID');
+        }
+
+        $basePath = 'data/properties/type/Human';
+        $csvFile = $basePath . '/' . $this->gender . '/' . $this->skin . '.csv';
+
+        return determine_pixels(csv_to_array($csvFile));
+    }
+
+    public function getProperties(): array
+    {
+        if (!$this->id) {
+            throw new Exception('Need an ID');
+        }
+
+        if ($this->properties) {
+            return $this->properties;
+        }
+
+        $csvFile = file(ROOT . '/data/properties.csv');
+        $data = [];
+        foreach ($csvFile as $line) {
+            $data[] = str_getcsv($line);
+        }
+
+        $properties = [
+            'type' => trim($data[$this->id][1]),
+            'gender' => trim($data[$this->id][2]),
+            'skin' => trim($data[$this->id][3]),
+            'attributes_count' => trim($data[$this->id][4]) . ' Attributes',
+            'accessories' => [],
+        ];
+
+        $propertiesString = $data[$this->id][5];
+        if ($propertiesString) {
+            foreach (explode('/', $propertiesString) as $property) {
+                $properties['accessories'][] = trim($property);
+            }
+        }
+
+        return $properties;
     }
 }
