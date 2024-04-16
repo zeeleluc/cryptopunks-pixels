@@ -40,6 +40,9 @@ if (!function_exists('csv_to_array')) {
 }
 
 if (!function_exists('determine_pixels')) {
+    /**
+     * @throws Exception
+     */
     function determine_pixels(array $pixels)
     {
         $determinedPixels = [];
@@ -47,7 +50,7 @@ if (!function_exists('determine_pixels')) {
         foreach ($pixels as $pixel) {
             $y = $pixel[0];
             $x = $pixel[1];
-            $color = $pixel[2];
+            $color = Color::getHex($pixel[2]);
             $opacity = 1;
             if (array_key_exists(3, $pixel)) {
                 $opacity = $pixel[3] / 100;
@@ -68,7 +71,12 @@ if (!function_exists('determine_pixels')) {
                     $determinedPixels[$color][] = $determinedPixel;
                 }
             } else {
-                $determinedPixels[$color][] = $pixel;
+                $determinedPixels[$color][] = [
+                    (int) $y,
+                    (int) $x,
+                    $color,
+                    $opacity
+                ];
             }
         }
 

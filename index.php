@@ -37,6 +37,9 @@ if (is_cli()) {
             throw new Exception('ID #' . $id . ' does not exists');
         }
 
+        // should return array response pretty or wrapped
+        $pretty = isset($argv[3]) && strtolower($argv[3]) === 'pretty';
+
         // show some info in the terminal
         echo 'Running action `' . $action . '`' . ($id ? ' for #' . $id : '') . PHP_EOL;
 
@@ -47,7 +50,11 @@ if (is_cli()) {
         if ($result) {
             echo '-------' . PHP_EOL;
             if (is_array($result)) {
-                $json = json_encode($result, JSON_PRETTY_PRINT);
+                if ($pretty) {
+                    $json = json_encode($result, JSON_PRETTY_PRINT);
+                } else {
+                    $json = json_encode($result);
+                }
                 print_r($json);
             }
             echo PHP_EOL;
