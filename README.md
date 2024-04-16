@@ -24,7 +24,7 @@ With this repo you could do the same by running the following command in your ke
 php index.php rasterize 15
 ```
 
-![alt text](generated/rasterized/15.png)
+![Rasterized CryptoPunk #15](generated/rasterized/15.png)
 
 ### Pulling pixel information
 Next to attributes pixel data, I've also separated pixels for the skin, the type (silouete) and eyes, nose + mouth.
