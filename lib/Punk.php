@@ -8,7 +8,16 @@ class Punk
 
     }
 
-    public function rasterize()
+    /**
+     * This is what I used for analyzing the CryptoPunks properties.
+     * This method simply grabs an original CryptoPunk and prints an overlay that shows x-y coordinates per pixel.
+     * I did this for each attribute and created separate CSV files for each attribute.
+     *
+     * @return void
+     * @throws ImagickDrawException
+     * @throws ImagickException
+     */
+    public function rasterize(): void
     {
         $white = new ImagickPixel('#ffffff');
 
